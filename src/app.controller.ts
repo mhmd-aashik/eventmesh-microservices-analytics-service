@@ -1,12 +1,23 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller } from '@nestjs/common';
+import { EventPattern, Payload } from '@nestjs/microservices';
+
+export interface PostCreatedEvent {
+  id: string;
+  userId: string;
+  content: string;
+  createdAt: string;
+}
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  private totalPosts = 0;
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @EventPattern('post.created')
+  handlePostCreated(@Payload() post: PostCreatedEvent) {
+    this.totalPosts++;
+
+    console.log('Analytics received post.created');
+    console.log(`Post ID: ${post.id}`);
+    console.log(`Total posts: ${this.totalPosts}`);
   }
 }
